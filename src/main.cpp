@@ -5,6 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#define WARN_LED_PIN 23
 #define SENSOR_TEMP_PIN 4
 #define LDR_PIN 12
 
@@ -19,7 +20,8 @@ int ldr = 0;
 float readTemp();
 int readLdr();
 
-void setup() {
+void setup()
+{
   Serial.begin(9600);
 
   sensors.begin();
@@ -31,24 +33,46 @@ void setup() {
   oled.print("ENVIRONMENT");
   oled.display();
 
-
   pinMode(SENSOR_TEMP_PIN, INPUT);
   pinMode(LDR_PIN, INPUT);
+  pinMode(WARN_LED_PIN, OUTPUT);
+
+  ledcSetup(0, 5000, 8);
+  ledcAttachPin(WARN_LED_PIN, 0);
 }
 
-
-void loop() {
-
-
+void loop()
+{
 }
 
-
-float readTemp() {
+float readTemp()
+{
   sensors.requestTemperatures();
   temp = sensors.getTempCByIndex(0);
   return temp;
 };
-int readLdr() {
+int readLdr()
+{
   ldr = analogRead(LDR_PIN);
   return ldr;
+}
+
+void logicLed()
+{
+  if (temp < 25)
+  {
+    ledcWrite(0, 0);
+  }
+  else if (temp > 25 && temp < 30)
+  {
+    ledcWrite(0, 76);
+  }
+  else if (temp > 30 && temp < 35)
+  {
+    ledcWrite(0, 153);
+  }
+  else if (temp > 35)
+  {
+    ledcWrite(0, 256);
+  }
 }
