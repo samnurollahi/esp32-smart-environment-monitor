@@ -54,6 +54,7 @@ float readTemp()
 int readLdr()
 {
   ldr = analogRead(LDR_PIN);
+  ldr = map(ldr, 0, 4095, 0, 100);
   return ldr;
 }
 
@@ -75,4 +76,23 @@ void logicLed()
   {
     ledcWrite(0, 256);
   }
+}
+void logicOled()
+{
+  String text = "";
+
+  oled.clearDisplay();
+
+  oled.setCursor(34, 0);
+  oled.print("ENVIRONMENT");
+
+  oled.setCursor(3, 15);
+  text = "TEMP: " + String(temp) + " C";
+  oled.print(text);
+
+  oled.setCursor(3, 30);
+  text = "LIGHT: " + String(temp) + " %";
+  oled.print(text);
+
+  oled.display();
 }
