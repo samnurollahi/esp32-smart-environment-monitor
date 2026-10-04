@@ -9,16 +9,29 @@
 #define SENSOR_TEMP_PIN 4
 #define LDR_PIN 12
 
+enum update
+{
+  LED,
+  OLED,
+  LDR,
+  DS18B20
+};
+
 OneWire oneWire(SENSOR_TEMP_PIN);
 DallasTemperature sensors(&oneWire);
 Adafruit_SSD1306 oled(128, 64, &Wire, -1);
 
-unsigned long prev = 0;
+unsigned long prevLdr = 0;
+unsigned long prevOled = 0;
+unsigned long prevTemp = 0;
 int temp = 0;
 int ldr = 0;
 
 float readTemp();
 int readLdr();
+void logicLed();
+void logicOled();
+void updateFunc();
 
 void setup()
 {
@@ -43,6 +56,34 @@ void setup()
 
 void loop()
 {
+  updateFunc();
+}
+
+void updateFunc()
+{
+  unsigned long now = millis();
+
+  if (now - prevLdr >= 200)
+  {
+    prevLdr = now;
+
+    readLdr();
+  }
+
+  if (now - prevOled >= 100)
+  {
+    prevOled = now;
+
+    logicOled();
+  }
+
+  if (now - prevTemp >= 1000)
+  {
+    prevTemp = now;
+
+    readTemp();
+    logicLed();
+  }
 }
 
 float readTemp()
